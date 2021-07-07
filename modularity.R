@@ -8,7 +8,7 @@
 # For each cell, the algorithm checks that the K neighbors belong to the same 
 # cluster as this cell (K given in Monocle 3 cluster_cells ())
 
-
+#Function
 modularity = function(cds, red_meth) {
   myclusters= clusters(cds, reduction_method = red_meth)
   from = cds@clusters@listData[[red_meth]][["cluster_result"]][["relations"]][["from"]]
@@ -18,4 +18,5 @@ modularity = function(cds, red_meth) {
   return(sum(clus_from == clus_to)/length(from))
 }
 
+# Exemple
 modularity(derybel_cds, )
