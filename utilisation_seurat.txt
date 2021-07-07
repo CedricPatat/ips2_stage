@@ -1,0 +1,231 @@
+>>>>>   Explications Seurat
+
+Il y a plusieurs fonctions de même nom et Seurat est apte à comprendre laquelle est choisie en fonction des arguments renseignés.
+
+
+|| Création de l'objet Seurat
+
+Il n'est pas nécessaire d'utiliser la fonction Read10X() pour lire les données. En effet, il suffit d'avoir la matrice des counts annotée (c'est-à-dire avec le nom des gènes en tant que nom de lignes et le nom des cellules en tant que nom de colonnes). La matrice annotée doit être idéalement de classe "dgTMatrix". Au cas où la classe n'est pas correcte voici la fonction pour le code pour la corriger : >> pbmc.data = as(pbmc.data,"dgTMatrix")
+
+Une fois les données annotées et au bon format, on peut créer l'objet Seurat avec la fonction : CreatSeuratObject().
+Détail des paramètres : 
+counts : matrice annotée, dgTMatrix
+project : nom du projet, character
+assay : nom de l'essai, character
+names.field : numéro de "zone" pour le nom des cellules, integer
+names.delim : délimite les "zones" du nom des cellules, character
+meta.data : autres données sur les cellules (autres colonnes de barcodes.tsv), data.frame
+min.cells : nombre de cellules minimum par gène, integer
+min.features : nombre de gène minimum par cellule, integer
+row.names : (optionel) lorsque les counts sont au format data.frame, c'est un vecteur indiquant le nom des lignes (donc des gènes), vector
+
+//Exemple : 
+pbmc = CreateSeuratObject(counts = pbmc.data,
+                          project = "MySeuratProject",
+                          assay = "RNA",
+                          names.field = 1,
+                          names.delim = NULL,
+                          meta.data = NULL,
+                          min.cells = 1,
+                          min.features = 0,
+                          row.names = NULL)
+
+
+|| Normalisation des données
+
+Vient ensuite l'étape de normalisation des données avec la fonction : NormalizeData().
+Détail des paramètres : 
+object : l'objet Seurat, Seurat Object
+normalization_method : "LogNormalize", "RC" (Relative Counts), "CLR" (Centered Log Ratio)
+scale.factor : valeur du size factor, integer
+margin : 1 (par défaut). Si CLR alors 1 ou 2 (1: normalisation sur les features ; 2 : normalisation sur les cellules), integer
+bock.size : nombre de cellule par morceau, repartition égale entre les threads, integer
+
+// Exemple : 
+pbmc = NormalizeData(pbmc,
+                     normalization.method = "LogNormalize",   
+                     scale.factor = 10000,
+                     margin = 1,                               
+                     block.size = NULL,
+                     verbose = TRUE)
+
+
+|| Détection des features les plus variables
+
+On identifie les gènes les plus variables dans le jeu de données avec la fonction FindVariableFeatures().
+Détail des paramètres : 
+object : l'objet Seurat, Seurat Object
+selection_method : méthode de choix des gènes les plus variables. 3 possibilités : "vst" (ajustement de chaque ligne grâce à la relation entre log(variance et log(moyenne). Puis normalisation des valeurs à l'aide de la moyenne observée et de la variance attendue.), "mvp" (mean var plot, calcul de la moyene et de la dispersion de chaque feature. Divise ensuite ces features en num.bin et calcule le z-score pour chaque bin. l'objectif est d'identifier les features variables tout en contrôlant la forte relation entre la variabilité et l'expression moyenne.), "disp" (selection des gènes ayant la plus forte dispersion)
+loess.span : (vst) Valeur pour ajuster la relation variance - moyenne
+clip.max : (vst) Les valeurs supérieures à cette valeur seront abaissées à cette valeur
+mean.function : (je supprime cet argument lorsque je run la fonction) 
+dispersion.function : (je supprime cet argument lorsque je run la fonction)
+num.bin : nombre total de bin lors de l'analyse des données scalées, integer
+binning.method : précise comment les bins sont calculés. Au choix : "equal_width" ou "equal_frequency"
+nfeatures : ("vst" ou "disp") nombre de gènes les plus variables selectionnés.
+mean.cutoff : valeur minimale et maximale pour borner les moyennes des features
+dispersion.cutoff : valeur minimale et maximale pour borner les dispersions de features
+assay : Essai sur lequel travailler, character
+
+// Exemple :
+pbmc = FindVariableFeatures(pbmc,
+                            assay = NULL,
+                            selection.method = "vst",
+                            loess.span = 0.3,
+                            clip.max = "auto",
+                            num.bin = 20,
+                            binning.method = "equal_width",
+                            nfeatures = 2000,
+                            mean.cutoff = c(0.1, 8),
+                            dispersion.cutoff = c(1, Inf),
+                            verbose = TRUE)
+
+
+On peut ensuite représenter la dispersion / variation des gènes avec la fonction VariableFeaturePlot(). L'argument de cette fonction est l'objet Seurat. La fonction LabelPoints() premet d'afficher les noms de gènes sélectionnés sur le graphique.
+
+Pour afficher selectionner les gènes les plus variables par leur nom, on utilise : head(VariableFratures(\objet_seurat/), \nombre_de_gènes_souhaité/).
+
+// Exemple : 
+top10_variable_features <- head(VariableFeatures(pbmc), 10)  
+plot_variable_features = LabelPoints(plot = VariableFeaturePlot(pbmc), 
+                                     points = top10_variable_features,
+                                     repel = TRUE)
+plot_variable_features
+
+
+
+|| Scaling des données
+
+Le scaling des données permet d'échelonner et de centrer les gènes. La fonction à utiliser est ScaleData()
+Détail des paramètres : 
+object : objet Seurat, Seurat Object
+features : nom des features sur lesquelles on souhaite scaler les données. Par défaut, le scaling se fait sur les gènes précédemment identififés comme variables, vector/character
+vars.to.regress : variables sur lesquelles pratiquer la régression
+latent.data : données suplémentaires pour la régression
+split.by : nom de la variable ou des variables (dans les metadatas de l'objet seurat) pour grouper les cellules
+model.use : modèle à utiliser pour la régression. Soit "linear", "poisson", "negbinom"
+use.umi : option pour faire la régression sur les counts UMI. FALSE pour le modèle linéaire et TRUE pour les modèles de Poisson et la binomiale negative
+do.scale : si on veut scaler les données , TRUE ou FALSE
+do.center : si on veut centrer les données , TRUE ou FALSE
+scale.max : valeur maximale pour scaler les données. Permet de réduire les effets de gènes exprimés dans peu de cellules
+block.size : nombre de features à scaler en un seul calcul. Une augmentation de cette valeur peut accélerer les calculs mais entrainera une augmentation du coût mémoire
+min.cells.to.block : nombre de cellules  en dessous du laquel le scaling du bloc n'aura pas lieu
+assay : nom de l'essai
+
+// Exemple :
+
+
+
+|| Analyse en composantes principales - Réduction linéaire
+
+La fonction RunPCA() permet de faire une PCA sur le jeu de données.
+Détail des paramètres :
+object : objet seurat
+assay : nom de l'essai
+features : features sur lequelles calculre la PCA. Si NULL, la PCA sera calculée sur les features variables
+npcs : nombre de composantes principales à calculer et enregistrer
+rev.pca : pour calculer la PCA sur la transposée. Par défaut la PCA est calculée pour une matrice cell x gene. Si TRUE alors le calcul sura sur une matrice gene x cell
+weight.by.var : pondère la diminution des cellules par la variance de chaque composante principale
+ndims.print : nombre de composantes principales pour lesquelles on souhaite afficher les gènes les plus variables. indiquer chaque composante (par exemple, pour afficher les 5 premières composantes, il faut écrire : 1:5)
+nfeatures.print : nombre de gènes que l'on souhaite afficher par composantes principales dans ndims.print
+reduction.name : nom de la réduction
+reduction.key : permet de définir ce qu'il y aura avant le numéro de la dimention. Par défaut : "PC_"
+seed.use : pour implémenter une graine alératoire. Si NULL, il n'y aura pas d'aléatoire
+approx : (inutile pour un objet Seurat) logique pour permettre ou non l'utilisation de valeurs singulières tronquées pour approximer la PCA
+
+// Exemple : 
+
+
+
+
+|| Réduction non linéaire UMAP
+
+La fonction RunUMAP() permet de calculer la réduction dimensionnelle en UMAP.
+Détail des paramètres : 
+objet : objet Seurat
+dims : (seulement si features = NULL) choix des dimensions à utiliser comme input features
+reduction : choix de la réduction ("pca" ou "ica") à utiliser comme input UMAP
+features : permet de calculer la réduction umap sur un sous-jeu de features plutôt que sur la réduction dimensionnelle pca ou ica
+graph : nom du graphe sur lequel calculer UMAP
+assay : 
+nn.name : 
+slot : 
+umap.method : 
+reduction.model : 
+return.model
+n.neighbors : 
+n.components :
+metric :
+n.epochs : 
+learning.rate :
+min.dist : 
+spread : 
+set.op.mix.ratio : 
+local.connectivity :
+repulsion.strength :
+negative.sample.rate : 
+a : 
+b : 
+uwot.sgd : 
+seed.use : 
+metric.kwds : 
+angular.rp.forest : 
+reduction.name : nom de la réduction. Permet de retrouvée les données générées par cette réduction dans l'objet Seurat
+reduction.key : permet de définir ce qu'il y aura avant le numéro de la dimention. Par défaut : "UMAP_"
+
+
+
+|| Réduction non linéaire t-SNE
+
+La fonction RunTSNE() peret de calculer la réduction dimensionelle en t-SNE. 
+Détail des paramètres : 
+objet : objet Seurat
+reduction : méthode de réduction linéaire utilisée ("pca" ou "ica"
+cells : choix des cellules à analyser. Par défaut, toutes les cellules
+dims : (features = NULL) choix des dimensions à utiliser comme input
+features : (dims = NULL) choix du sous-jeu sur lequel pratiquer la réduction t-SNE
+seed.use : choix de l'aléatoire pour calculer t-SNE
+tsne.method : deux méthodes au choix : "Rtsne" (méthode pour construire une intégration de faible dimension de données, de distances ou de similitudes de grande dimension) ou "Flt-SNE" (utilise la transformée rapide de Fourier)
+dim.embed : nombre de dimensions souhaitées pour la réduction t-SNE
+distance.matrix : si non NULL, permet de faire la réduction t-SNE sur une matrice de distances données plutot que la matrice expérimentale
+reduction.name : nom de la réduction. Permet de retrouvée les données générées par cette réduction dans l'objet Seurat
+reduction.key : permet de définir ce qu'il y aura avant le numéro de la dimention. Par défaut : "tSNE_"
+
+// Exemple : 
+
+|| Détection des voisins
+
+|| Détection des clusters
+
+|| Représentation graphique
+
+|| Représentation graphique de l'expression des gènes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
