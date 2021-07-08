@@ -1,0 +1,109 @@
+>>>>>   Explications Seurat
+
+Il y a plusieurs fonctions de même nom et Seurat est apte à comprendre laquelle est choisie en fonction des arguments renseignés.
+
+
+|| Création de l'objet Seurat
+
+Il n'est pas nécessaire d'utiliser la fonction Read10X() pour lire les données. En effet, il suffit d'avoir la matrice des counts annotée (c'est-à-dire avec le nom des gènes en tant que nom de lignes et le nom des cellules en tant que nom de colonnes). La matrice annotée doit être idéalement de classe "dgTMatrix". Au cas où la classe n'est pas correcte voici la fonction pour le code pour la corriger : >> pbmc.data = as(pbmc.data,"dgTMatrix)
+
+Une fois les données annotées et au bon format, on peut créer l'objet Seurat avec la fonction : CreatSeuratObject().
+Voici à quoi correspond chaque paramètre :
+counts : matrice annotée, dgTMatrix
+project : nom du projet, character
+assay : nom de l'essai, character
+names.field : numéro de "zone" pour le nom des cellules, integer
+names.delim : délimite les "zones" du nom des cellules, character
+meta.data : autres données sur les cellules (autres colonnes de barcodes.tsv), data.frame
+min.cells : nombre de cellules minimum par gène, integer
+min.features : nombre de gène minimum par cellule, integer
+row.names : (optionel) lorsque les counts sont au format data.frame, c'est un vecteur indiquant le nom des lignes (donc des gènes), vector
+
+//Exemple : 
+pbmc = CreateSeuratObject(counts = pbmc.data,
+                          project = "MySeuratProject",
+                          assay = "RNA",
+                          names.field = 1,
+                          names.delim = NULL,
+                          meta.data = NULL,
+                          min.cells = 1,
+                          min.features = 0,
+                          row.names = NULL)
+
+
+|| Normalisation des données
+
+Vient ensuite l'étape de normalisation des données avec la fonction : NormalizeData().
+Détail des paramètres : 
+object : l'objet Seurat, Seurat Object/
+normalization_method : "LogNormalize", "RC" (Relative Counts), "CLR" (Centered Log Ratio)
+scale.factor : valeur du size factor, integer
+margin : 1 (par défaut). Si CLR alors 1 ou 2 (1: normalisation sur les features ; 2 : normalisation sur les cellules), integer
+bock.size : nombre de cellule par morceau, repartition égale entre les threads, integer
+
+// Exemple : 
+pbmc = NormalizeData(pbmc,
+                     normalization.method = "LogNormalize",   
+                     scale.factor = 10000,
+                     margin = 1,                               
+                     block.size = NULL,
+                     verbose = TRUE)
+
+
+|| Détection des features les plus variables
+
+On identifie les gènes les plus variables dans le jeu de données avec la fonction FindVariableFeatures().
+Détail des paramètres : 
+object : l'objet Seurat
+selection_method : méthode de choix des gènes les plus variables. 3 possibilités : "vst" (ajustement de chaque ligne grâce à la realtion entre log(variance et log(moyenne). Puis normalisation des valeurs à l'aide de la moyenne observée et de la variance attendue.), "mvp" (mean var plot, calcul de la moyene et de la dispersion de chaque feature. Divise ensuite ces features en num.bin et calcule le z-score pour chaque bin. l'objectif est d'identifier les features variables tout en contrôlant la forte relation entre la variabilité et l'expression moyenne.), "disp" (selection des gènes ayant la plus forte dispersion)
+loess.span : 
+clip.max : 
+mean.function : (je supprime cet argument lorsque je run la fonction) 
+dispersion.function : (je supprime cet argument lorsque je run la fonction)
+
+
+On peut ensuite représenter la dispersion / variation des gènes avec la fonction VariableFeaturePlot(). L'argument de cette fonction est l'objet Seurat. La fonction LabelPoints() premet d'afficher les noms de gènes sélectionnés sur le graphique.
+
+Pour afficher selectionner les gènes les plus variables par leur nom, on utilise : head(VariableFratures(\objet_seurat/), \nombre_de_gènes_souhaité/).
+
+// Exemple : 
+top10_variable_features <- head(VariableFeatures(pbmc), 10)  
+plot_variable_features = LabelPoints(plot = VariableFeaturePlot(pbmc), 
+                                     points = top10_variable_features,
+                                     repel = TRUE)
+plot_variable_features
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
