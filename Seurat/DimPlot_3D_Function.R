@@ -34,7 +34,7 @@ DimPlot_3D = function(object, dims, reduction.method, group.by){
   if(!length(dims) == 3){
     return(message("ERROR :  dims must be 3 digits "))
   }
-  if(!group.by%in% colnames(derybel_epidermis_seurat@meta.data)){
+  if(!group.by %in% colnames(object@meta.data)){
     return(message("ERROR : wrong name for metadata column in group.by parameter"))
   }
   
