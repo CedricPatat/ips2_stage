@@ -48,7 +48,7 @@ FeaturePlot_3D = function(object, dims, reduction.method, feature){
     tSNE_2 = object@reductions[["tsne"]]@cell.embeddings[,dims[2]]
     tSNE_3 = object@reductions[["tsne"]]@cell.embeddings[,dims[3]]
     
-    cell.expression = derybel_epidermis_seurat@assays[["RNA"]]@data[feature,]
+    cell.expression = object@assays[["RNA"]]@data[feature,]
     
     fig = plot_ly(x=tSNE_1, y=tSNE_2, z=tSNE_3, type="scatter3d",mode = "markers", color = cell.expression, 
                   colors = color.list, sizes = c(10:10), size = 1)
@@ -62,7 +62,7 @@ FeaturePlot_3D = function(object, dims, reduction.method, feature){
     umap_2 = object@reductions[["umap"]]@cell.embeddings[,dims[2]]
     umap_3 = object@reductions[["umap"]]@cell.embeddings[,dims[3]]
     
-    cell.expression = derybel_epidermis_seurat@assays[["RNA"]]@data[feature,]
+    cell.expression = object@assays[["RNA"]]@data[feature,]
     
     fig = plot_ly(x=umap_1, y=umap_2, z=umap_3, type="scatter3d",mode = "markers", color = cell.expression, 
                   colors = color.list, sizes = c(10:10), size = 1)
@@ -76,7 +76,7 @@ FeaturePlot_3D = function(object, dims, reduction.method, feature){
     pca_2 = object@reductions[["pca"]]@cell.embeddings[,dims[2]]
     pca_3 = object@reductions[["pca"]]@cell.embeddings[,dims[3]]
     
-    cell.expression = derybel_epidermis_seurat@assays[["RNA"]]@data[feature,]
+    cell.expression = object@assays[["RNA"]]@data[feature,]
     
     fig = plot_ly(x=pca_1, y=pca_2, z=pca_3, type="scatter3d",mode = "markers", color = cell.expression, 
                   colors = color.list, sizes = c(10:10), size = 1)
@@ -90,7 +90,7 @@ FeaturePlot_3D = function(object, dims, reduction.method, feature){
     ica_2 = object@reductions[["ica"]]@cell.embeddings[,dims[2]]
     ica_3 = object@reductions[["ica"]]@cell.embeddings[,dims[3]]
     
-    cell.expression = derybel_epidermis_seurat@assays[["RNA"]]@data[feature,]
+    cell.expression = object@assays[["RNA"]]@data[feature,]
     
     fig = plot_ly(x=ica_1, y=ica_2, z=ica_3, type="scatter3d",mode = "markers", color = cell.expression, 
                   colors = color.list, sizes = c(10:10), size = 1)
