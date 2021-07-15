@@ -37,7 +37,7 @@ FeaturePlot_3D = function(object, dims, reduction.method, feature){
   if(!length(dims) == 3){
     return(message("ERROR :  dims must be 3 digits "))
   }
-  if(!feature%in% derybel_epidermis_seurat@assays[["RNA"]]@counts@Dimnames[[1]]){
+  if(!feature%in% object@assays[["RNA"]]@counts@Dimnames[[1]]){
     return(message("ERROR : wrong name for feature in feature parameter"))
   }
   
