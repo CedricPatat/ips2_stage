@@ -27,7 +27,7 @@ specificity = function(object, features){
     return(message("ERROR :  object's class must be 'Seurat'."))
   }
   for(nfeature in 1:length(features)){
-    if(! features[nfeature] %in% derybel_epidermis_seurat@assays[["RNA"]]@counts@Dimnames[[1]]){
+    if(! features[nfeature] %in% object@assays[["RNA"]]@counts@Dimnames[[1]]){
       return(message("ERROR : wrong name for feature in feature parameter"))
     }
   }
