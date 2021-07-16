@@ -21,6 +21,7 @@
 
 DimPlot_3D = function(object, dims, reduction.method, group.by){
   
+  library(plotly)
   library(rgl)
   options(rgl.printRglwidget =TRUE)
   
@@ -47,7 +48,6 @@ DimPlot_3D = function(object, dims, reduction.method, group.by){
     
     cell.cluster = object@meta.data[[group.by]]
     cluster.legend = as.character(cell.cluster)
-    color.list = color.list[1:length(unique(cluster.legend))]
     
     fig = plot_ly(x=tSNE_1, y=tSNE_2, z=tSNE_3, type="scatter3d",mode = "markers", color = cluster.legend, 
                    sizes = c(10:10), size = 1)
@@ -63,7 +63,6 @@ DimPlot_3D = function(object, dims, reduction.method, group.by){
     
     cell.cluster = object@meta.data[[group.by]]
     cluster.legend = as.character(cell.cluster)
-    color.list = color.list[1:length(unique(cluster.legend))]
     
     fig = plot_ly(x=umap_1, y=umap_2, z=umap_3, type="scatter3d",mode = "markers", color = cluster.legend, 
                    sizes = c(10:10), size = 1)
@@ -79,7 +78,6 @@ DimPlot_3D = function(object, dims, reduction.method, group.by){
     
     cell.cluster = object@meta.data[[group.by]]
     cluster.legend = as.character(cell.cluster)
-    color.list = color.list[1:length(unique(cluster.legend))]
     
     fig = plot_ly(x=pca_1, y=pca_2, z=pca_3, type="scatter3d",mode = "markers", color = cluster.legend, 
                    sizes = c(10:10), size = 1)
@@ -95,7 +93,6 @@ DimPlot_3D = function(object, dims, reduction.method, group.by){
     
     cell.cluster = object@meta.data[[group.by]]
     cluster.legend = as.character(cell.cluster)
-    color.list = color.list[1:length(unique(cluster.legend))]
     
     fig = plot_ly(x=ica_1, y=ica_2, z=ica_3, type="scatter3d",mode = "markers", color = cluster.legend, 
                    sizes = c(10:10), size = 1)
