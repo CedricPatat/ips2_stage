@@ -167,9 +167,10 @@ DimPlot_3D(object = gala_all, dims=c(1:3), reduction.method = "umap", group.by =
   # We got 3 clusters. We have therefore divided the entire dataset into two, a first subset
   # consisting of clusters 0 and 2 (supposedly stele + cortex + endodermis) and a second corresponding
   # to cluster 1 (supposedly epidermis + atrichoblast + trichoblast + columella + lateral root cap).
+  # Cell types are supposed thanks to Galaés annotations.
 
 
-### Subclustering of the entire dataset (cluster 1)
+### Subclustering of the whole dataset (cluster 1)
 
 cells.subset1 = names(gala_all@active.ident[which(gala_all@active.ident ==1)])
 gala_cells.subset1 = gala_cells[cells.subset1,]
