@@ -43,7 +43,7 @@ colnames(gala_matrix)= rownames(gala_cells)
 rownames(gala_matrix) = gala_genes[,1]
 
 
-### Clustering of the entier dataset
+### Clustering of the whole dataset
 
 gala_all = CreateSeuratObject(counts = gala_matrix,
                                  project = "Gala Annotation",
