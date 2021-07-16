@@ -22,6 +22,7 @@
 
 FeaturePlot_3D = function(object, dims, reduction.method, feature){
   
+  library(plotly)
   library(rgl)
   options(rgl.printRglwidget =TRUE)
   
