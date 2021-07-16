@@ -14,6 +14,7 @@
 # will store the new cell type assignments and the "gene_marker" column stores the marker genes
 # of the cluster or sub-cluster which made it possible to identify the cell type.
 
+
 ##### Annotation Script
 
 ### Loading libraries
